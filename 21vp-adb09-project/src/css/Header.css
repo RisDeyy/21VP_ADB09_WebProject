@@ -1,0 +1,13 @@
+.text-custom-color {
+    color: black; /* Màu chữ mặc định */
+    text-decoration: none; /* Loại bỏ gạch chân */
+  }
+  
+.text-custom-color:hover {
+color: #0056b3; /* Màu chữ khi hover */
+}
+
+.text-custom-color.active {
+color: blue !important; /* Màu chữ khi được chọn */
+}
+
