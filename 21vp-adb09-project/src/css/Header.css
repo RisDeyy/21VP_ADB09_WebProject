@@ -1,6 +1,8 @@
 .text-custom-color {
     color: black; /* Màu chữ mặc định */
     text-decoration: none; /* Loại bỏ gạch chân */
+    font-size: 20px;
+    margin-right: 20px;
   }
   
 .text-custom-color:hover {
@@ -9,5 +11,10 @@ color: #0056b3; /* Màu chữ khi hover */
 
 .text-custom-color.active {
 color: blue !important; /* Màu chữ khi được chọn */
+}
+
+.web-name {
+  font-size: 25px;
+  margin-right: 50px;
 }
 

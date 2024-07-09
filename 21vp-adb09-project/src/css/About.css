@@ -1,0 +1,63 @@
+.contact__widget {
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    margin-bottom: 20px;
+  }
+  
+  .map {
+    margin-bottom: 40px;
+  }
+  
+  .contact__form__title {
+    margin-bottom: 20px;
+  }
+  
+  .site-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+  }
+  
+  .site-btn:hover {
+    background-color: #0056b3;
+  }
+
+  .contact__widget {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ddd; /* Chỉ để dễ nhìn, có thể bỏ */
+    padding: 20px;
+    width: 100%;
+    
+  }
+  
+  .contact .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .contact .col-lg-3,
+  .contact .col-md-3,
+  .contact .col-sm-6 {
+    display: flex;
+    flex: 1;
+    min-width: 200px; /* Đảm bảo các cột có chiều rộng tối thiểu */
+  }
+  
+  .map {
+    margin-bottom: 40px;
+  }
+  
+  .contact-form .contact__form__title {
+    margin-bottom: 20px;
+  }
+  
+  .contact-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
