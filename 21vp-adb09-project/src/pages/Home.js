@@ -11,7 +11,7 @@ const Home = () => {
 
       <Container className="mt-4">
         <Form className="d-flex mb-4">
-          <FormControl type="search" placeholder="Tìm kiếm dịch vụ..." className="me-2" aria-label="Search" />
+          <FormControl type="search" placeholder="Tìm kiếm..." className="me-2" aria-label="Search" />
           <Button variant="outline-success">Tìm kiếm</Button>
         </Form>
       </Container>

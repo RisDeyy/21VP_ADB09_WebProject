@@ -1,0 +1,42 @@
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+  
+  .list-group-item {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  .list-group-item h6 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+  .list-group-item p {
+    margin: 5px 0;
+  }
+  
+  .list-group-item a {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .list-group-item .text-end p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .list-group-item .text-end button {
+    margin-top: 10px;
+  }
+  
+.appointment-list {
+    max-height: 600px; /* Chiều cao tối đa */
+    overflow-y: auto; /* Bật chế độ cuộn dọc */
+  }
+  

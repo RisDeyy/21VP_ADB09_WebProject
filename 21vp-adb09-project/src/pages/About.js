@@ -32,7 +32,7 @@ const About = () => {
               <div className="contact__widget">
                 <FontAwesomeIcon icon={faClock} className="icon_clock_alt" />
                 <h4>Thời gian mở cửa</h4>
-                <p>08:00AM tới 21:00PM </p>
+                <p>08:00AM tới 19:45PM </p>
               </div>
             </Col>
             <Col lg={3} md={3} sm={6} className="text-center">
