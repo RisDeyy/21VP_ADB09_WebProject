@@ -7,5 +7,6 @@ router.get('/customers/:id', customerController.getCustomerById);
 router.post('/customers', customerController.createCustomer);
 router.put('/customers/:id', customerController.updateCustomer);
 router.delete('/customers/:id', customerController.deleteCustomer);
+router.get('/customers/:id/appointments', customerController.getAppointmentsByCustomer);
 
 module.exports = router;
