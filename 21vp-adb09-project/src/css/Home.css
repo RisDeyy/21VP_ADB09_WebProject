@@ -1,10 +1,15 @@
-.form-service {
+ .form-service {
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     border-radius: 5px;
     background-color: rgb(182, 237, 237);
+    color: white;
+  }
+
+  a {
+    text-decoration: none;
   }
 
 .section {

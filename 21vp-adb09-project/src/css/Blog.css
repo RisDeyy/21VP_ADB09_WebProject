@@ -1,0 +1,12 @@
+.image-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .fixed-size-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo rằng hình ảnh bao phủ toàn bộ container mà không bị méo */
+  }
+  

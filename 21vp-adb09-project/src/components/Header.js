@@ -17,8 +17,8 @@ const Header = () => {
             <NavLink to="/about" className="nav-link text-custom-color" activeClassName="active">Liên hệ</NavLink>
           </Nav>
           <Nav>
-            <NavLink to="#login" className="nav-link">Hello Account</NavLink>
-            <NavLink to="#logout" className="nav-link">Log out</NavLink>
+            <NavLink to="/sign-up" className="nav-link">Đăng ký</NavLink>
+            <NavLink to="/sign-in" className="nav-link">Đăng nhập</NavLink>
           </Nav>
         </Navbar.Collapse>
       </Container>
