@@ -1,0 +1,11 @@
+.sidebar {
+    height: 90vh;
+    background: rgb(227, 243, 243);
+    padding-top: 1rem;
+}
+
+.menu-list {
+    padding-top: 1rem;
+    font-size: 20px;
+    text-align: left;
+}

@@ -1,0 +1,25 @@
+.content-area {
+  display: flex;
+  align-items: center;
+}
+
+
+.image-container {
+  justify-self:right;
+  padding-top: 10%;
+}
+
+.image {
+  border: none;
+  border-radius: 15px;
+}
+
+h2 {
+  font-weight: bolder;
+  font-style: italic;
+  color: #FFCC00; /* Change this to the desired color */
+}
+
+p {
+  color: #FFCC00; /* Change this to the desired color */
+}

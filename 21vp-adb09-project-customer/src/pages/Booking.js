@@ -44,7 +44,7 @@ const Booking = () => {
           <Card.Header as="h5" className='text-center'>Tìm kiếm lịch hẹn</Card.Header>
           <Card.Body>
             <Row>
-              <Col md={7}>
+              <Col md={6}>
                 <h5>Thông tin buổi hẹn</h5>
                 <Form onSubmit={handleSearch}>
                   <Row className="mb-3">
