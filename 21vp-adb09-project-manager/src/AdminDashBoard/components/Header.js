@@ -6,13 +6,13 @@ const Header = () => {
   return (
     <Navbar className='header' expand="lg">
       <Container fluid>
-        <Navbar.Brand href="#home" className='logo'>
+        <Navbar.Brand href="#home" className='logo fw-bold'>
           <img
             src="/logo192.png"
             height="30"
             className="d-inline-block align-top"
             alt="Logo"
-          />
+          /> DR.CHANGCANNANG
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -21,7 +21,7 @@ const Header = () => {
               <i className="bi bi-bell-fill"></i>
             </Nav.Link>
             <Nav.Link href="#profile">
-              <Image src="img/profile.jpg" roundedCircle height="40" />
+              <Image src="/img/profile.jpg" roundedCircle height="40" />
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
