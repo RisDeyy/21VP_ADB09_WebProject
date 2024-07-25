@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <Navbar className='header' expand="lg">
       <Container fluid>
-        <Navbar.Brand href="#home" className='logo fw-bold'>
+        <Navbar.Brand href="/admin" className='logo fw-bold'>
           <img
             src="/logo192.png"
             height="30"

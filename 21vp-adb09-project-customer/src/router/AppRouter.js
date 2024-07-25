@@ -9,6 +9,7 @@ import SignUp from '../pages/SignUp';
 import UserAccount from '../pages/UserAccount';
 import ChooseAppointment from '../pages/ChooseAppointment';
 import { AppointmentProvider } from '../contexts/AppointmentContext';
+import Confirm from '../pages/Confirm';
 
 const AppRouter = () => {
   return (
@@ -16,6 +17,7 @@ const AppRouter = () => {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/about" element={<About />} />
@@ -23,6 +25,7 @@ const AppRouter = () => {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/user-account" element={<UserAccount />} />
+          <Route path="/booking/choose-appointment/confirm-appointment" element={<Confirm />} />
         </Routes>
       </Router>
     </AppointmentProvider>

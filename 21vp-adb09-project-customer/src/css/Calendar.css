@@ -1,0 +1,17 @@
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .custom-datepicker {
+    width: 100%; /* Đảm bảo lịch có chiều rộng bằng với khung nhập liệu */
+    height: 400px; /* Chiều cao cố định */
+    overflow-y: auto; /* Thêm cuộn dọc nếu cần */
+    border: 1px solid #ced4da; /* Thêm đường viền cho phù hợp với khung nhập liệu */
+    border-radius: 0.25rem; /* Bo góc cho phù hợp với khung nhập liệu */
+    padding: 0.5rem; /* Thêm khoảng cách bên trong */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Thêm bóng đổ nhẹ */
+  }
+  

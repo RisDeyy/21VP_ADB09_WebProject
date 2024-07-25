@@ -5,6 +5,7 @@ import Admin from '../pages/account-management/Admin';
 import Employee from '../pages/account-management/Employee';
 import Dentist from '../pages/account-management/Dentist';
 import Customer from '../pages/account-management/Customer';
+import Revenue from '../pages/revenue-statistics/Revenue';
 
 const AppRoutesAdmin = () => {
   return (
@@ -18,6 +19,9 @@ const AppRoutesAdmin = () => {
         <Route path="/admin/account-management/employee-account" element={<Employee/>} />
         <Route path="/admin/account-management/dentist-account" element={<Dentist/>} />
         <Route path="/admin/account-management/customer-account" element={<Customer/>} />
+        <Route path="/revenue-statistics" element={<Revenue/>} />
+        <Route path="/admin/revenue-statistics" element={<Revenue/>} />
+        <Route path="/admin/revenue-statistics/by-revenue" element={<Revenue/>} />
         {/* Add more routes here */}
       </Routes>
     </Router>
