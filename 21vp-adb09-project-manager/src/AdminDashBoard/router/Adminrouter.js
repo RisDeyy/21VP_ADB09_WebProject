@@ -6,6 +6,8 @@ import Employee from '../pages/account-management/Employee';
 import Dentist from '../pages/account-management/Dentist';
 import Customer from '../pages/account-management/Customer';
 import Revenue from '../pages/revenue-statistics/Revenue';
+import NumberOfAppointments from '../pages/revenue-statistics/NumberOfAppointments';
+import NumberOfCustomes from '../pages/revenue-statistics/NumberOfCustomers';
 
 const AppRoutesAdmin = () => {
   return (
@@ -22,6 +24,8 @@ const AppRoutesAdmin = () => {
         <Route path="/revenue-statistics" element={<Revenue/>} />
         <Route path="/admin/revenue-statistics" element={<Revenue/>} />
         <Route path="/admin/revenue-statistics/by-revenue" element={<Revenue/>} />
+        <Route path="/admin/revenue-statistics/by-number-of-customers" element={<NumberOfCustomes/>} />
+        <Route path="/admin/revenue-statistics/by-number-of-appointments" element={<NumberOfAppointments/>} />
         {/* Add more routes here */}
       </Routes>
     </Router>
