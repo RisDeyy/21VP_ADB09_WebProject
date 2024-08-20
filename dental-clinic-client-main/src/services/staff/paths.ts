@@ -1,0 +1,14 @@
+export const GET_APPOINTMENT_REQUESTS = '/api/staff/appointment-requests';
+export const GET_PATIENTS = '/api/staff/patients';
+export const GET_DENTISTS = '/api/staff/dentists';
+export const GET_ROOMS = '/api/staff/rooms';
+export const POST_EXAMINATION = '/api/staff/examination';
+export const GET_DENTIST_FOR_PATIENT = '/api/staff/dentist-for-patient';
+export const GET_EXAMINATION = '/api/staff/examinations';
+export const GET_EXAMINATION_DETAIL = '/api/staff/examinations';
+export const GET_TREATMENT_SESSIONS = '/api/staff/treatment-sessions';
+export const GET_TEETH = '/api/staff/teeth';
+export const GET_CATEGORIES = '/api/staff/categories';
+export const GET_ASSISTANTS = '/api/staff/assistants';
+export const POST_TREATMENT_SESSION = '/api/staff/treatment-session';
+export const DELETE_APPOINTMENT_REQUESTS = '/api/staff/appointment-requests';
