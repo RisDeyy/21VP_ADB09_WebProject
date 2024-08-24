@@ -1,117 +1,113 @@
-use DentalClinicDev
-go
+USE DentalClinicDev;
+GO
 
 BEGIN TRY
+    BEGIN TRANSACTION;
 
-BEGIN TRAN;
+    -- First, create filegroups to store rows based on the `appointmentTime` column within the specified ranges
+    ALTER DATABASE DentalClinicDev
+    ADD FILEGROUP AppointmentRequest_lt_2019,
+    ADD FILEGROUP AppointmentRequest_2019,
+    ADD FILEGROUP AppointmentRequest_2019_2020,
+    ADD FILEGROUP AppointmentRequest_2020_2021,
+    ADD FILEGROUP AppointmentRequest_2021_2022,
+    ADD FILEGROUP AppointmentRequest_2022_2023,
+    ADD FILEGROUP AppointmentRequest_gt_2023_2024,
+    ADD FILEGROUP AppointmentRequest_lt_2024;
 
---First, create file groups will store the rows with the `time` column in the range of 2018 and 2023
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_lt_2018
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_2018_2019
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_2019_2020
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_2020_2021
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_2021_2022
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_2022_2023
-ALTER DATABASE DentalClinicDev
-ADD FILEGROUP AppointmentRequest_gt_2023
-
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-  NAME = AppointmentRequest_lt_2018,
-  FILENAME = 'C:\sql_partition\AppointmentRequest_lt_2018.ndf',
-    SIZE = 10 MB, 
-    MAXSIZE = UNLIMITED, 
-    FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_lt_2018;
-
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-  NAME = AppointmentRequest_2018_2019,
-  FILENAME = 'C:\sql_partition\AppointmentRequest_2018_2019.ndf',
-      SIZE = 10 MB, 
-      MAXSIZE = UNLIMITED, 
-      FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_2018_2019;
-
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-    NAME = AppointmentRequest_2019_2020,
-    FILENAME = 'C:\sql_partition\AppointmentRequest_2019_2020.ndf',
-    SIZE = 10 MB, 
-    MAXSIZE = UNLIMITED, 
-    FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_2019_2020;
-
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-    NAME = AppointmentRequest_2020_2021,
-    FILENAME = 'C:\sql_partition\AppointmentRequest_2020_2021.ndf',
-        SIZE = 10 MB, 
+    -- Add files to the filegroups
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_lt_2019',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_lt_2019.ndf',
+        SIZE = 10MB, 
         MAXSIZE = UNLIMITED, 
-        FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_2020_2021;
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_lt_2019;
 
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-    NAME = AppointmentRequest_2021_2022,
-    FILENAME = 'C:\sql_partition\AppointmentRequest_2021_2022.ndf',
-        SIZE = 10 MB, 
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_2019_2020',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_2019_2020.ndf',
+        SIZE = 10MB, 
         MAXSIZE = UNLIMITED, 
-        FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_2021_2022;
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_2019_2020;
 
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-    NAME = AppointmentRequest_2022_2023,
-    FILENAME = 'C:\sql_partition\AppointmentRequest_2022_2023.ndf',
-        SIZE = 10 MB, 
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_2020_2021',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_2020_2021.ndf',
+        SIZE = 10MB, 
         MAXSIZE = UNLIMITED, 
-        FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_2022_2023;
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_2020_2021;
 
-ALTER DATABASE DentalClinicDev    
-ADD FILE (
-    NAME = AppointmentRequest_gt_2023,
-    FILENAME = 'C:\sql_partition\AppointmentRequest_gt_2023.ndf',
-        SIZE = 10 MB, 
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_2021_2022',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_2021_2022.ndf',
+        SIZE = 10MB, 
         MAXSIZE = UNLIMITED, 
-        FILEGROWTH = 1024 KB
-) TO FILEGROUP AppointmentRequest_gt_2023;
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_2021_2022;
 
-------------Create a partition function
-CREATE PARTITION FUNCTION AppointmentRequest_by_year_function(datetime2)
-AS RANGE RIGHT 
-FOR VALUES ('2018-01-01', '2019-01-01', '2020-01-01', '2021-01-01', '2022-01-01', '2023-01-01');
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_2022_2023',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_2022_2023.ndf',
+        SIZE = 10MB, 
+        MAXSIZE = UNLIMITED, 
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_2022_2023;
 
---Create a partition scheme
-CREATE PARTITION SCHEME AppointmentRequest_by_year_scheme
-AS PARTITION AppointmentRequest_by_year_function
-TO (
-    AppointmentRequest_lt_2018,
-    AppointmentRequest_2018_2019,
-    AppointmentRequest_2019_2020,
-    AppointmentRequest_2020_2021,
-    AppointmentRequest_2021_2022,
-    AppointmentRequest_2022_2023,
-    AppointmentRequest_gt_2023
-);
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_2023_2024',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_2023_2024.ndf',
+        SIZE = 10MB, 
+        MAXSIZE = UNLIMITED, 
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_2023_2024;
 
---CREATE NONCLUSTERED INDEX idx_AppointmentRequest_time
---ON dbo.AppointmentRequest
---(
---	[appointmentTime]
---) ON [AppointmentRequest_by_year_scheme]([time])
+    ALTER DATABASE DentalClinicDev    
+    ADD FILE (
+        NAME = N'AppointmentRequest_gt_2024',
+        FILENAME = N'C:\sql_partition\AppointmentRequest_gt_2024.ndf',
+        SIZE = 10MB, 
+        MAXSIZE = UNLIMITED, 
+        FILEGROWTH = 1024KB
+    ) TO FILEGROUP AppointmentRequest_gt_2024;
 
-COMMIT TRAN;
+    -- Create a partition function
+    CREATE PARTITION FUNCTION AppointmentRequest_by_year_function(datetime2)
+    AS RANGE RIGHT 
+    FOR VALUES ('2018-01-01', '2019-01-01', '2020-01-01', '2021-01-01', '2022-01-01', '2023-01-01');
+
+    -- Create a partition scheme
+    CREATE PARTITION SCHEME AppointmentRequest_by_year_scheme
+    AS PARTITION AppointmentRequest_by_year_function
+    TO (
+        AppointmentRequest_lt_2019,
+        AppointmentRequest_2019,
+        AppointmentRequest_2019_2020,
+        AppointmentRequest_2020_2021,
+        AppointmentRequest_2021_2022,
+        AppointmentRequest_2022_2023,
+        AppointmentRequest_gt_2023_2024,
+        AppointmentRequest_lt_2024
+    );
+
+    -- Uncomment the following lines to create a nonclustered index on the partitioned table
+    -- CREATE NONCLUSTERED INDEX idx_AppointmentRequest_time
+    -- ON dbo.AppointmentRequest
+    -- (
+    --     [appointmentTime]
+    -- ) ON [AppointmentRequest_by_year_scheme]([appointmentTime]);
+
+    COMMIT TRANSACTION;
 END TRY
-
 BEGIN CATCH
-	PRINT(@@ERROR)
-    ROLLBACK TRAN;
+    PRINT ERROR_MESSAGE();
+    ROLLBACK TRANSACTION;
 END CATCH;

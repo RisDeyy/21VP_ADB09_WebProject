@@ -1,6 +1,6 @@
 import express from 'express';
-import dentistRoute from './api/dentist.route';
-import staffRoute from './api/staff.route';
+import dentistRoute from '../src/routes/api/dentist.route';
+import staffRoute from '../src/routes/api/staff.route';
 // API routes (/api/...)
 const router = express.Router();
 

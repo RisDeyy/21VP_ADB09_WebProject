@@ -1,540 +1,327 @@
-use DentalClinicDev
-GO
--- Account table
+USE DentalClinicDev;
+
+DELIMITER //
+
+-- Account triggers
 CREATE TRIGGER CheckPasswordLength
-ON [dbo].[Account]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Account
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT password
-        FROM inserted
-        WHERE LEN([password]) <= 0 OR LEN([password]) > 61
-    )
-	BEGIN
-        RAISERROR('Password length must be greater than 0 and less than 61 characters.', 16, 1)
-        ROLLBACK;
-	END
-END;
-GO
+    IF LENGTH(NEW.password) <= 0 OR LENGTH(NEW.password) > 61 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Password length must be greater than 0 and less than 61 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckUsernameLength
-ON [dbo].[Account]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Account
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT username
-        FROM inserted
-        WHERE LEN([username]) <= 0 OR LEN([username]) > 11
-    )
-    BEGIN
-        RAISERROR('Username length must be greater than 0 and less than 11 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.username) <= 0 OR LENGTH(NEW.username) > 11 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Username length must be greater than 0 and less than 11 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckEmailLength
-ON [dbo].[Account]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Account
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT email
-        FROM inserted
-        WHERE LEN([email]) <= 0 OR LEN([email]) > 51
-    )
-    BEGIN
-        RAISERROR('Email length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.email) <= 0 OR LENGTH(NEW.email) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Email length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
--- Personnel Table
+-- Personnel triggers
 CREATE TRIGGER CheckNationalIDLength
-ON [dbo].[Personnel]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Personnel
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT nationalID
-        FROM inserted
-        WHERE LEN([nationalID]) <= 0 OR LEN([nationalID]) > 13
-    )
-    BEGIN
-        RAISERROR('National ID length must be greater than 0 and less than 13 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.nationalID) <= 0 OR LENGTH(NEW.nationalID) > 13 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'National ID length must be greater than 0 and less than 13 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckNameLength
-ON [dbo].[Personnel]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Personnel
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 13 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPhoneLength
-ON [dbo].[Personnel]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Personnel
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT phone
-        FROM inserted
-        WHERE LEN([phone]) <= 0 OR LEN([phone]) > 11
-    )
-    BEGIN
-        RAISERROR('Phone length must be greater than 0 and less than 11 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.phone) <= 0 OR LENGTH(NEW.phone) > 11 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Phone length must be greater than 0 and less than 11 characters.';
+    END IF;
+END//
 
--- Patient Table
+-- Patient triggers
 CREATE TRIGGER CheckPatientNationalIDLength
-ON [dbo].[Patient]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Patient
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT nationalID
-        FROM inserted
-        WHERE LEN([nationalID]) <= 0 OR LEN([nationalID]) > 13
-    )
-    BEGIN
-        RAISERROR('National ID length must be greater than 0 and less than 13 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.nationalID) <= 0 OR LENGTH(NEW.nationalID) > 13 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'National ID length must be greater than 0 and less than 13 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPatientNameLength
-ON [dbo].[Patient]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Patient
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 13 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPatientPhoneLength
-ON [dbo].[Patient]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Patient
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT phone
-        FROM inserted
-        WHERE LEN([phone]) <= 0 OR LEN([phone]) > 11
-    )
-    BEGIN
-        RAISERROR('Phone length must be greater than 0 and less than 11 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.phone) <= 0 OR LENGTH(NEW.phone) > 11 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Phone length must be greater than 0 and less than 11 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPatientAllergyStatusLength
-ON [dbo].[Patient]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Patient
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT allergyStatus
-        FROM inserted
-        WHERE LEN([allergyStatus]) <= 0 OR LEN([allergyStatus]) > 256
-    )
-    BEGIN
-        RAISERROR('Allergy Status length must be greater than 0 and less than 256 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.allergyStatus) <= 0 OR LENGTH(NEW.allergyStatus) > 256 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Allergy Status length must be greater than 0 and less than 256 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPatientDrugContraindicationLength
-ON [dbo].[Patient]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Patient
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT drugContraindication
-        FROM inserted
-        WHERE LEN([drugContraindication]) <= 0 OR LEN([drugContraindication]) > 501
-    )
-    BEGIN
-        RAISERROR('Drug Contraindication length must be greater than 0 and less than 501 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.drugContraindication) <= 0 OR LENGTH(NEW.drugContraindication) > 501 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Drug Contraindication length must be greater than 0 and less than 501 characters.';
+    END IF;
+END//
 
---Session Table
+-- Session triggers
 CREATE TRIGGER CheckSessionNoteLength
-ON [dbo].[Session]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Session
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT note
-        FROM inserted
-        WHERE LEN([note]) <= 0 OR LEN([note]) > 1001
-    )
-    BEGIN
-        RAISERROR('Note length must be greater than 0 and less than 1001 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.note) <= 0 OR LENGTH(NEW.note) > 1001 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Note length must be greater than 0 and less than 1001 characters.';
+    END IF;
+END//
 
--- TreatmentSession Table
+-- TreatmentSession triggers
 CREATE TRIGGER CheckHealthNoteLength
-ON [dbo].[TreatmentSession]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON TreatmentSession
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT healthNote
-        FROM inserted
-        WHERE LEN([healthNote]) <= 0 OR LEN([healthNote]) > 1001
-    )
-    BEGIN
-        RAISERROR('Health Note length must be greater than 0 and less than 1001 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.healthNote) <= 0 OR LENGTH(NEW.healthNote) > 1001 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Health Note length must be greater than 0 and less than 1001 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckDescriptionLength
-ON [dbo].[TreatmentSession]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON TreatmentSession
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT (description)
-        FROM inserted
-        WHERE LEN([description]) <= 0 OR LEN([description]) > 1001
-    )
-    BEGIN
-        RAISERROR('Description length must be greater than 0 and less than 1001 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.description) <= 0 OR LENGTH(NEW.description) > 1001 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Description length must be greater than 0 and less than 1001 characters.';
+    END IF;
+END//
 
---Room Table
+-- Room triggers
 CREATE TRIGGER CheckCodeLength
-ON [dbo].[Room]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Room
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT code
-        FROM inserted
-        WHERE LEN([code]) <= 0 OR LEN([code]) > 7
-    )
-    BEGIN
-        RAISERROR('Code length must be greater than 0 and less than 7 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.code) <= 0 OR LENGTH(NEW.code) > 7 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Code length must be greater than 0 and less than 7 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckRoomNameLength
-ON [dbo].[Room]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Room
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
--- Procedure Table
+-- Procedure triggers
 CREATE TRIGGER CheckProcCodeLength
-ON [dbo].[Procedure]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON `Procedure`
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT code
-        FROM inserted
-        WHERE LEN([code]) <= 0 OR LEN([code]) > 4
-    )
-    BEGIN
-        RAISERROR('Code length must be greater than 0 and less than 4 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.code) <= 0 OR LENGTH(NEW.code) > 4 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Code length must be greater than 0 and less than 4 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckProcNameLength
-ON [dbo].[Procedure]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON `Procedure`
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckProcDescriptionLength
-ON [dbo].[Procedure]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON `Procedure`
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT (description)
-        FROM inserted
-        WHERE LEN([description]) <= 0 OR LEN([description]) > 256
-    )
-    BEGIN
-        RAISERROR('Description length must be greater than 0 and less than 256 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.description) <= 0 OR LENGTH(NEW.description) > 256 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Description length must be greater than 0 and less than 256 characters.';
+    END IF;
+END//
 
--- Category Table
+-- Category triggers
 CREATE TRIGGER CheckCategoryCodeLength
-ON [dbo].[Category]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Category
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT code
-        FROM inserted
-        WHERE LEN([code]) <= 0 OR LEN([code]) > 4
-    )
-    BEGIN
-        RAISERROR('Code length must be greater than 0 and less than 4 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.code) <= 0 OR LENGTH(NEW.code) > 4 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Code length must be greater than 0 and less than 4 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckCategoryNameLength
-ON [dbo].[Category]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Category
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckCategoryDescriptionLength
-ON [dbo].[Category]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Category
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT (description)
-        FROM inserted
-        WHERE LEN([description]) <= 0 OR LEN([description]) > 256
-    )
-    BEGIN
-        RAISERROR('Description length must be greater than 0 and less than 256 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.description) <= 0 OR LENGTH(NEW.description) > 256 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Description length must be greater than 0 and less than 256 characters.';
+    END IF;
+END//
 
--- Drug Table
+-- Drug triggers
 CREATE TRIGGER CheckDrugCodeLength
-ON [dbo].[Drug]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Drug
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT code
-        FROM inserted
-        WHERE LEN([code]) <= 0 OR LEN([code]) > 18
-    )
-    BEGIN
-        RAISERROR('Code length must be greater than 0 and less than 18 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.code) <= 0 OR LENGTH(NEW.code) > 18 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Code length must be greater than 0 and less than 18 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckDrugNameLength
-ON [dbo].[Drug]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Drug
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckDrugDescriptionLength
-ON [dbo].[Drug]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Drug
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT (description)
-        FROM inserted
-        WHERE LEN([description]) <= 0 OR LEN([description]) > 256
-    )
-    BEGIN
-        RAISERROR('Description length must be greater than 0 and less than 256 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.description) <= 0 OR LENGTH(NEW.description) > 256 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Description length must be greater than 0 and less than 256 characters.';
+    END IF;
+END//
 
---Tooth Table
+-- Tooth triggers
 CREATE TRIGGER CheckToothNameLength
-ON [dbo].[Tooth]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Tooth
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT name
-        FROM inserted
-        WHERE LEN([name]) <= 0 OR LEN([name]) > 51
-    )
-    BEGIN
-        RAISERROR('Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.name) <= 0 OR LENGTH(NEW.name) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
--- Prescription Table
+-- Prescription triggers
 CREATE TRIGGER CheckPrescriptionNoteLength
-ON [dbo].[Prescription]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON Prescription
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT note
-        FROM inserted
-        WHERE LEN([note]) <= 0 OR LEN([note]) > 501
-    )
-    BEGIN
-        RAISERROR('Note length must be greater than 0 and less than 501 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.note) <= 0 OR LENGTH(NEW.note) > 501 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Note length must be greater than 0 and less than 501 characters.';
+    END IF;
+END//
 
--- Appointment Request Table
+-- AppointmentRequest triggers
 CREATE TRIGGER CheckPatientNameLength
-ON [dbo].[AppointmentRequest]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON AppointmentRequest
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT patientName
-        FROM inserted
-        WHERE LEN([patientName]) <= 0 OR LEN([patientName]) > 51
-    )
-    BEGIN
-        RAISERROR('Patient Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.patientName) <= 0 OR LENGTH(NEW.patientName) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Patient Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckCategoryNameLength
-ON [dbo].[AppointmentRequest]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON AppointmentRequest
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT categoryName
-        FROM inserted
-        WHERE LEN([categoryName]) <= 0 OR LEN([categoryName]) > 51
-    )
-    BEGIN
-        RAISERROR('Category Name length must be greater than 0 and less than 51 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.categoryName) <= 0 OR LENGTH(NEW.categoryName) > 51 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Category Name length must be greater than 0 and less than 51 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckPatientPhoneLength
-ON [dbo].[AppointmentRequest]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON AppointmentRequest
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT patientPhone
-        FROM inserted
-        WHERE LEN([patientPhone]) <= 0 OR LEN([patientPhone]) > 11
-    )
-    BEGIN
-        RAISERROR('Patient phone length must be greater than 0 and less than 11 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.patientPhone) <= 0 OR LENGTH(NEW.patientPhone) > 11 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Patient phone length must be greater than 0 and less than 11 characters.';
+    END IF;
+END//
 
 CREATE TRIGGER CheckNoteLength
-ON [dbo].[AppointmentRequest]
-FOR INSERT, UPDATE
-AS
+BEFORE INSERT ON AppointmentRequest
+FOR EACH ROW
 BEGIN
-    IF EXISTS (
-        SELECT note
-        FROM inserted
-        WHERE LEN([note]) <= 0 OR LEN([note]) > 256
-    )
-    BEGIN
-        RAISERROR('Note length must be greater than 0 and less than 256 characters.', 16, 1);
-        ROLLBACK;
-    END;
-END;
-GO
+    IF LENGTH(NEW.note) <= 0 OR LENGTH(NEW.note) > 256 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Note length must be greater than 0 and less than 256 characters.';
+    END IF;
+END//
+
+DELIMITER ;

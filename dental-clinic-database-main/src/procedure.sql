@@ -1,398 +1,323 @@
-use DentalClinicDev
-go
+DELIMITER //
 
--- PROC FOR STAFF:
--- STA1: View patient's appointment requests
--- STA2: Delete patient's appointment requests
--- STA3: Check if a patient has done a session before 
--- STA4: Staff schedules a new appointment (examination session) for patient
--- STA5: Staff schedules a new re-examination session for patient
--- STA6: Staff views list of available dentists for an appointment (examination session) of a patient
--- STA14: Staff creates a new payment record for a patient
--- STA15: Staff updates a payment record for a patient
--- STA17: View a patient's payment records 
--- STA24: creates a new treatment session for a patient
-
--- PROC FOR DENTIST:
--- DEN12: Update a patient's prescription
-
--- PROC FOR ADMIN:
--- ADM29: Update account details
--- ADM30: View account details 
-
--- PROC FOR PATIENT:
--- PAT1: View list of categories 
--- PAT2: View list of procedures of a category
--- PAT3: Schedule a new appointment
-
--- PROC OF STAFF
-CREATE PROCEDURE viewAppointment			--STA1
-AS
+-- Xóa thủ tục viewAppointment nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewAppointment//
+CREATE PROCEDURE viewAppointment()
 BEGIN
-	BEGIN TRAN
-		BEGIN TRY
-			BEGIN TRAN
-			SELECT patientName, patientPhone FROM [dbo].[AppointmentRequest] 
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-	COMMIT TRAN
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE delAppoint					--STA2
-@appointmentID INT
-AS
-BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		BEGIN
-			DELETE FROM [dbo].[AppointmentRequest] 
-			WHERE [dbo].[AppointmentRequest].id = @appointmentID
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    START TRANSACTION;
+    SELECT patientName, patientPhone FROM AppointmentRequest;
+    COMMIT;
+END//
 
-CREATE PROCEDURE checkPatientIsExamined			--STA3
-@patientPhone CHAR(10)
-AS
+-- Xóa thủ tục delAppoint nếu đã tồn tại
+DROP PROCEDURE IF EXISTS delAppoint//
+CREATE PROCEDURE delAppoint(IN appointmentID INT)
 BEGIN
-	BEGIN TRAN
-		BEGIN TRY
-			BEGIN TRAN
-			IF EXISTS (SELECT P.id FROM [dbo].[Patient] P WHERE P.phone = @patientPhone)
-			BEGIN
-				SELECT S.id, S.dentistID, S.patientID, S.status, S.time, S.type FROM [dbo].[Patient] P INNER JOIN [dbo].[Session] S ON S.[patientID] = P.id WHERE P.phone = @patientPhone
-			END
-			ELSE
-			BEGIN
-				RAISERROR('Patient not found.',16,1)
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-	COMMIT TRAN
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE createNewExaminationSesion				--STA4
-@patientPhone CHAR(10),
-@note VARCHAR(1000),
-@roomID INT,
-@dentistID INT
-AS
-BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		DECLARE @PatientID INT;
-		DECLARE @SessionID INT;
-		IF EXISTS (SELECT [dbo].[Patient].id, [dbo].[Patient].name FROM [dbo].[Patient] WHERE [dbo].[Patient].phone = @patientPhone)
-		BEGIN
-			SELECT @PatientID = id FROM [dbo].[Patient] WHERE [dbo].[Patient].phone = @patientPhone;
-			DECLARE @InsertedIDs TABLE (ID INT);
-			INSERT INTO [dbo].[Session](time, patientID, note, type, roomID, dentistID) OUTPUT inserted.id INTO @InsertedIDs VALUES (GETDATE(), @PatientID, @note, 'EXA', @roomID, @dentistID);
-			SELECT @SessionID = ID FROM @InsertedIDs;
-			INSERT INTO [dbo].[ExaminationSession](id) VALUES (@SessionID)
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    START TRANSACTION;
+    DELETE FROM AppointmentRequest WHERE id = appointmentID;
+    COMMIT;
+END//
 
-CREATE PROCEDURE createNewReExaminationSession			--STA5
-@patientPhone CHAR(10),
-@note VARCHAR(1000),
-@roomID INT,
-@dentistID INT,
-@assistantID INT
-AS 
+-- Xóa thủ tục checkPatientIsExamined nếu đã tồn tại
+DROP PROCEDURE IF EXISTS checkPatientIsExamined//
+CREATE PROCEDURE checkPatientIsExamined(IN patientPhone CHAR(10))
 BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		DECLARE @PatientID INT;
-		DECLARE @examSessionID INT;
-		DECLARE @SessionID INT;
-		DECLARE @time DATETIME2;
-		SELECT top 1 @time = appointmentTime FROM AppointmentRequest WHERE dbo.AppointmentRequest.patientPhone = @patientPhone AND  appointmentTime < GETDATE() ORDER BY id DESC 
-		SELECT @PatientID = id FROM [dbo].[Patient] WHERE [dbo].[Patient].phone = @patientPhone
-		IF @PatientID IS NOT NULL 
-		BEGIN
-			DECLARE @InsertedIDs TABLE (ID INT);
-			IF EXISTS (SELECT [dbo].[Personnel].id FROM [dbo].[Personnel] WHERE [dbo].[Personnel].id = @assistantID AND [dbo].[Personnel].type = 'AST')
-				BEGIN
-					SELECT @examSessionID = MAX(id) FROM [dbo].[Session] WHERE [dbo].[Session].patientID = @PatientID AND [dbo].[Session].type = 'EXA'
-					INSERT INTO [dbo].[Session](time, patientID, note, type, roomID, dentistID, assistantID) OUTPUT inserted.id INTO @InsertedIDs VALUES (@time, @PatientID, @note, 'REX', @roomID, @dentistID, @assistantID);
-					SELECT @SessionID = ID FROM @InsertedIDs;
-				END
-				ELSE
-				BEGIN
-					SELECT @examSessionID = MAX(id) FROM [dbo].[Session] WHERE [dbo].[Session].patientID = @PatientID AND [dbo].[Session].type = 'EXA'
-					INSERT INTO [dbo].[Session](time, patientID, note, type, roomID, dentistID) OUTPUT inserted.id INTO @InsertedIDs VALUES (@time, @PatientID, @note, 'REX', @roomID, @dentistID);
-					SELECT @SessionID = ID FROM @InsertedIDs;
-				END
-			INSERT INTO [dbo].[ReExaminationSession] (id,relatedExaminationID) VALUES (@SessionID, @examSessionID);
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		print('ERROR')
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE viewAvailableDentist			--STA7			-- FIX THIS PROC
-@day INT
-AS 
-BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		DECLARE @SessionID INT;
-		DECLARE @Time DATETIME2;
-		IF (@day IN (1,2,3,4,5,6,7))
-		BEGIN
-			SELECT *
-			FROM [dbo].[SCHEDULE] S JOIN [dbo].[Personnel] P ON P.id = S.dentistID WHERE S.dayID = @day;
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    START TRANSACTION;
+    IF EXISTS (SELECT id FROM Patient WHERE phone = patientPhone) THEN
+        SELECT S.id, S.dentistID, S.patientID, S.status, S.time, S.type 
+        FROM Patient P 
+        INNER JOIN Session S ON S.patientID = P.id 
+        WHERE P.phone = patientPhone;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient not found.';
+    END IF;
+    COMMIT;
+END//
 
-CREATE PROCEDURE createNewPayment			--STA14
-@patientPhone CHAR(10),
-@total INT,
-@change INT,
-@paid INT
-AS 
+-- Xóa thủ tục createNewExaminationSession nếu đã tồn tại
+DROP PROCEDURE IF EXISTS createNewExaminationSession//
+CREATE PROCEDURE createNewExaminationSession(
+    IN patientPhone CHAR(10),
+    IN note VARCHAR(1000),
+    IN roomID INT,
+    IN dentistID INT
+)
 BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		DECLARE @PatientID INT;
-		SELECT @PatientID = [dbo].[Patient].id FROM [dbo].[Patient] WHERE [dbo].[Patient].phone = @patientPhone
-		IF @PatientID IS NOT NULL
-		BEGIN
-			INSERT INTO [dbo].[PaymentRecord](date, total, paid, change, patientID) VALUES (CONVERT(DATE, GETDATE()), @total, @paid, @change, @PatientID)
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    DECLARE PatientID INT;
+    DECLARE SessionID INT;
 
-CREATE PROCEDURE updatePayment				--STA15
-@patientPhone CHAR(10),
-@paid INT,
-@method CHAR(1),
-@date DATETIME2
-AS 
-BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		DECLARE @PatientID INT;
-		SELECT @PatientID = id FROM [dbo].[Patient] WHERE [dbo].[Patient].phone = @patientPhone
-		IF @PatientID IS NOT NULL
-		BEGIN
-			UPDATE [dbo].[PaymentRecord]
-			SET [dbo].[PaymentRecord].[paid] = @paid,
-			[dbo].[PaymentRecord].[method] = @method,
-			[dbo].[PaymentRecord].[date] = CONVERT(DATE, GETDATE())
-			WHERE [patientID] = @PatientID AND [date] = @date
-		END
-		ELSE
-		BEGIN
-			PRINT('ERROR')
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE viewPaymentRecord			--STA17
-@patientID INT
-AS
-BEGIN
-	BEGIN TRY
-		BEGIN TRAN
-		BEGIN
-			SELECT * FROM [dbo].[PaymentRecord] WHERE [dbo].[PaymentRecord].patientID = @patientID
-		END
-		COMMIT TRAN
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-	END CATCH
-END
-GO
+    START TRANSACTION;
+    IF EXISTS (SELECT id FROM Patient WHERE phone = patientPhone) THEN
+        SELECT id INTO PatientID FROM Patient WHERE phone = patientPhone;
+        INSERT INTO Session(time, patientID, note, type, roomID, dentistID)
+        VALUES (NOW(), PatientID, note, 'EXA', roomID, dentistID);
+        
+        SET SessionID = LAST_INSERT_ID();
+        INSERT INTO ExaminationSession(id) VALUES (SessionID);
+    END IF;
+    COMMIT;
+END//
 
-ALTER PROCEDURE createNewTreatmentSession				--STA24
-@patientID CHAR(10),
-@note VARCHAR(1000),
-@room INT,
-@dentistID INT,
-@assistantID INT,
-@healthNote nvarchar(1000),
-@des nvarchar(1000),
-@categoryID INT
-AS
-BEGIN
-	BEGIN TRAN
-		BEGIN TRY
-		BEGIN TRAN
-			DECLARE @SessionID INT;
-			BEGIN
-				DECLARE @InsertedIDs TABLE (ID INT);
-				INSERT INTO [dbo].[Session](time, patientID, note, type, status, dentistID, assistantID, roomID) OUTPUT inserted.id INTO @InsertedIDs VALUES (CONVERT(DATETIME2,GETDATE()), @PatientID, @note, 'TRE','SCH', @dentistID, @assistantID, @room);
-				SELECT @SessionID = ID FROM @InsertedIDs;
-				INSERT INTO [dbo].[TreatmentSession] (id,healthNote,description,categoryID) VALUES (@SessionID, @healthNote, @des, @categoryID)
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-	COMMIT TRAN
-END
-GO
+-- Xóa thủ tục createNewReExaminationSession nếu đã tồn tại
+DROP PROCEDURE IF EXISTS createNewReExaminationSession//
 
--- PROC OF ADMIN
-CREATE PROCEDURE updateAccDetail						--ADM29
-@username CHAR(10),
-@oldPass CHAR(60),
-@newPass CHAR(60)
-AS
+-- Xóa thủ tục viewAvailableDentist nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewAvailableDentist//
+CREATE PROCEDURE viewAvailableDentist(IN day INT)
 BEGIN
-		BEGIN TRY
-		BEGIN TRAN
-			IF EXISTS (SELECT A.username FROM [dbo].[Account] A WHERE A.username = @username 
-															AND A.password = @oldPass)
-			BEGIN
-				UPDATE [dbo].[Account]
-				SET [password] = @newPass
-				WHERE [dbo].[Account].username = @username 
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE viewAcc				--ADM30
-@personnelID INT
-AS
-BEGIN
-		BEGIN TRY
-			BEGIN TRAN
-			BEGIN
-				SELECT * FROM [dbo].[Account] WHERE [dbo].[Account].personnelID = @personnelID
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    START TRANSACTION;
+    IF day BETWEEN 1 AND 7 THEN
+        SELECT * FROM SCHEDULE S 
+        JOIN Personnel P ON P.id = S.dentistID 
+        WHERE S.dayID = day;
+    END IF;
+    COMMIT;
+END//
 
--- PROC OF PATIENT
-CREATE PROCEDURE viewCategories						--PAT1
-AS
+-- Xóa thủ tục createNewPayment nếu đã tồn tại
+DROP PROCEDURE IF EXISTS createNewPayment//
+CREATE PROCEDURE createNewPayment(
+    IN patientPhone CHAR(10),
+    IN total INT,
+    IN `change` INT,
+    IN paid INT
+)
 BEGIN
-		BEGIN TRY
-		BEGIN TRAN
-			SELECT name FROM [dbo].[Category]
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    DECLARE PatientID INT;
 
-CREATE PROCEDURE viewProcedures					--PAT2
-AS
-BEGIN
-		BEGIN TRY
-		BEGIN TRAN
-			SELECT P.name, C.name, P.fee FROM [dbo].[Procedure] P JOIN [dbo].[Category] C ON P.[categoryID] = C.[id]
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
 
-CREATE PROCEDURE createNewAppointment						--PAT3
-@appointmentTime DATETIME2,
-@note NVARCHAR(255),
-@categoryName NVARCHAR(50),
-@patientName NVARCHAR(50),
-@patientPhone CHAR(10)
-AS
-BEGIN
-		BEGIN TRY
-		BEGIN TRAN
-			BEGIN
-				INSERT INTO [dbo].[AppointmentRequest](appointmentTime, requestTime, note, patientName, patientPhone, categoryName)
-				values (@appointmentTime, CONVERT(DATETIME2,GETDATE()), @note, @patientName, @patientPhone, @categoryName);
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    START TRANSACTION;
+    SELECT id INTO PatientID FROM Patient WHERE phone = patientPhone;
+    IF PatientID IS NOT NULL THEN
+        INSERT INTO PaymentRecord(date, total, paid, `change`, patientID)
+        VALUES (CURDATE(), total, paid, `change`, PatientID);
+    END IF;
+    COMMIT;
+END//
 
--- PROC OF DENTIST
-CREATE PROCEDURE updatePrescription								 --DEN12
-@dentistID INT,
-@patientID INT,
-@newNote NVARCHAR(500),
-@drugID INT
-AS
+-- Xóa thủ tục updatePayment nếu đã tồn tại
+DROP PROCEDURE IF EXISTS updatePayment//
+CREATE PROCEDURE updatePayment(
+    IN patientPhone CHAR(10),
+    IN paid INT,
+    IN method CHAR(1),
+    IN date TIMESTAMP
+)
 BEGIN
-		BEGIN TRY
-		BEGIN TRAN
-			IF EXISTS (SELECT dentistID, patientID FROM [dbo].[Session] S WHERE S.[dentistID] = @dentistID
-															AND S.[patientID] = @patientID)
-			BEGIN
-				UPDATE P
-				SET P.[note] = @newNote
-				P.[drugID] = @drugID
-				FROM [dbo].[Prescription] P
-				INNER JOIN [dbo].[TreatmentSession] TS ON P.[treatmentSessionID] = TS.[id]
-				INNER JOIN [dbo].[Session] S ON TS.[id] = S.[id]
-				WHERE S.[patientID] = @patientID
-				AND S.[dentistID] = @dentistID
-			END
-			COMMIT TRAN
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRAN
-		END CATCH
-END
-GO
+    DECLARE PatientID INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT id INTO PatientID FROM Patient WHERE phone = patientPhone;
+    IF PatientID IS NOT NULL THEN
+        UPDATE PaymentRecord
+        SET paid = paid, method = method, date = CURDATE()
+        WHERE patientID = PatientID AND date = date;
+    END IF;
+    COMMIT;
+END//
+
+-- Xóa thủ tục viewPaymentRecord nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewPaymentRecord//
+CREATE PROCEDURE viewPaymentRecord(IN patientID INT)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT * FROM PaymentRecord WHERE patientID = patientID;
+    COMMIT;
+END//
+
+-- Xóa thủ tục createNewTreatmentSession nếu đã tồn tại
+DROP PROCEDURE IF EXISTS createNewTreatmentSession//
+CREATE PROCEDURE createNewTreatmentSession(
+    IN patientID CHAR(10),
+    IN note VARCHAR(1000),
+    IN room INT,
+    IN dentistID INT,
+    IN assistantID INT,
+    IN healthNote NVARCHAR(1000),
+    IN description NVARCHAR(1000),
+    IN categoryID INT
+)
+BEGIN
+    DECLARE SessionID INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    INSERT INTO Session(time, patientID, note, type, status, dentistID, assistantID, roomID)
+    VALUES (NOW(), patientID, note, 'TRE', 'SCH', dentistID, assistantID, room);
+
+    SET SessionID = LAST_INSERT_ID();
+    INSERT INTO TreatmentSession(id, healthNote, description, categoryID) 
+    VALUES (SessionID, healthNote, description, categoryID);
+    COMMIT;
+END//
+
+-- Xóa thủ tục updateAccDetail nếu đã tồn tại
+DROP PROCEDURE IF EXISTS updateAccDetail//
+CREATE PROCEDURE updateAccDetail(
+    IN username CHAR(10),
+    IN oldPass CHAR(60),
+    IN newPass CHAR(60)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    IF EXISTS (SELECT username FROM Account WHERE username = username AND password = oldPass) THEN
+        UPDATE Account SET password = newPass WHERE username = username;
+    END IF;
+    COMMIT;
+END//
+
+-- Xóa thủ tục viewAcc nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewAcc//
+CREATE PROCEDURE viewAcc(IN personnelID INT)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT * FROM Account WHERE personnelID = personnelID;
+    COMMIT;
+END//
+
+-- Xóa thủ tục viewCategories nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewCategories//
+CREATE PROCEDURE viewCategories()
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT name FROM Category;
+    COMMIT;
+END//
+
+-- Xóa thủ tục viewProcedures nếu đã tồn tại
+DROP PROCEDURE IF EXISTS viewProcedures//
+CREATE PROCEDURE viewProcedures()
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT P.name, C.name AS categoryName, P.fee 
+    FROM `Procedure` P 
+    JOIN Category C ON P.categoryID = C.id;
+    COMMIT;
+END//
+
+-- Xóa thủ tục createNewAppointment nếu đã tồn tại
+DROP PROCEDURE IF EXISTS createNewAppointment//
+CREATE PROCEDURE createNewAppointment(
+    IN appointmentTime TIMESTAMP,
+    IN note NVARCHAR(255),
+    IN categoryName NVARCHAR(50),
+    IN patientName NVARCHAR(50),
+    IN patientPhone CHAR(10)
+)
+BEGIN
+    DECLARE categoryID INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    SELECT id INTO categoryID FROM Category WHERE name = categoryName;
+    INSERT INTO AppointmentRequest(appointmentTime, note, categoryID, patientPhone, patientName) 
+    VALUES (appointmentTime, note, categoryID, patientPhone, patientName);
+    COMMIT;
+END//
+
+-- Xóa thủ tục updatePrescription nếu đã tồn tại
+DROP PROCEDURE IF EXISTS updatePrescription//
+CREATE PROCEDURE updatePrescription(
+    IN patientID CHAR(10),
+    IN prescription NVARCHAR(1000)
+)
+BEGIN
+    DECLARE sessionID INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+    IF EXISTS (SELECT * FROM Session S WHERE S.patientID = patientID) THEN
+        SELECT id INTO sessionID FROM Session WHERE patientID = patientID ORDER BY time DESC LIMIT 1;
+        INSERT INTO Prescription(sessionID, prescription) 
+        VALUES (sessionID, prescription);
+    END IF;
+    COMMIT;
+END//
+
+DELIMITER ;

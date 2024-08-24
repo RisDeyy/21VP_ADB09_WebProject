@@ -3,7 +3,7 @@ import prismaClient from "../src/utils/prismaClient";
 
 export const getPersonels = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const personels = await prismaClient.personnel.findMany();
+    const personels = await prismaClient.personel.findMany();
 
     res.status(200).json(personels);
   } catch (error) {
@@ -13,7 +13,7 @@ export const getPersonels = async (req: Request, res: Response, next: NextFuncti
 
 export const getPersonelById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const personel = await prismaClient.personnel.findUnique({
+    const personel = await prismaClient.personel.findUnique({
       where:{
         id: parseInt(req.params.id)
       }
