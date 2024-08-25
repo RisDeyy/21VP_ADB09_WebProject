@@ -64,7 +64,6 @@ CREATE TABLE Appointment (
     Date DATE NOT NULL,
     StartTime VARCHAR(50) NOT NULL,
     SymptomDescription VARCHAR(255) NOT NULL,
-    Service VARCHAR(255) CHECK (Service IN ('Nho rang', 'Tram rang', 'lam trang rang', '...')),
     DentistInCharge INT,
     CustomerInformationID INT NOT NULL,
     FOREIGN KEY (DentistInCharge) REFERENCES Dentist(UserID),
